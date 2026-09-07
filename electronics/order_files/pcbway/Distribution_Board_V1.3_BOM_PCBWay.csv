@@ -32,7 +32,7 @@ Item,Qty,Reference,Value,Package/Footprint,MPN,Manufacturer,LCSC #,Notes
 31,3,"J1, J2, J3",JST VH 2-pin connector,JST_VH_B2P-VH-FB-B_1x02_P3.96mm_Vertical,,,C160315,
 32,10,"J21, J22, J25, J26, J29, J30, J33, J34, J37, J38",Pin Header 1x03 2.54mm (Jumper),PinHeader_1x03_P2.54mm_Vertical,,,C49257,
 33,2,"U1, U2",KH-2.54FH-1X20P-H8.5 Female Header 20P,HDR-TH_20P-P2.54-V-F-2,,,C2905423,
-34,1,D1,MBR120VLSFT1G Schottky Diode,SOD-123,MBR120VLSFT1G,ON Semiconductor,,
+34,1,D1,MBR120VLSFT1G Schottky Diode,SOD-123,MBR120VLSFT1G,ON Semiconductor,,DNP - do not populate
 35,1,U6,PCA9306 I2C Level Translator,Texas_S-PDSO-G8_3x3mm_P0.65mm,PCA9306,Texas Instruments,C123752,
 36,1,U7,PCA9685PW 16ch PWM Controller,TSSOP-28,PCA9685PW,NXP,C92206,
 37,2,"J16, J18",PM254V-11-06-H85 6-pin header,HDR-TH_6P-P2.54-V-F,,,C2832269,

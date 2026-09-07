@@ -27,8 +27,8 @@ Source designs live in `electronics/KiCad/0_Adapter_Board/` and
 
 | Manufacturer | Service model | Notes |
 |---|---|---|
-| **JLCPCB** | Instant online quote, portal-driven | BOM uses LCSC part numbers; DNP parts (D1, U3, U4, U5) have no LCSC equivalent and must be sourced and fitted separately |
-| **PCBWay** | Manual quote via portal/sales rep | Full turnkey assembly including DNP parts; accepts panel-by-supplier for Adapter Board |
+| **JLCPCB** | Instant online quote, portal-driven | BOM uses LCSC part numbers; DNP parts (U3, U4, U5) have no LCSC equivalent and must be sourced and fitted separately; D1 is DNP for all manufacturers, see below |
+| **PCBWay** | Manual quote via portal/sales rep | Full turnkey assembly including U3/U4/U5; accepts panel-by-supplier for Adapter Board; D1 is DNP, confirmed with the manufacturer |
 
 ### European manufacturers
 
@@ -37,23 +37,27 @@ Source designs live in `electronics/KiCad/0_Adapter_Board/` and
 | **Beta LAYOUT** | Germany | Quote by e-mail | PCB pool service; component costs quoted separately at order time |
 | **Eurocircuits** | Belgium / Hungary | Portal + PCBA inquiry | ENIG and HAL lead-free are cost-equivalent; Solder Jumpers must be declared DNP manually |
 
-## DNP components (JLCPCB only)
+## DNP components
 
-The components below are marked **Do Not Place** in the JLCPCB BOM because they have
-no LCSC equivalents. All other manufacturers source and assemble them without issues.
+D1 is **Do Not Place** across all manufacturers. It was previously assumed to be a
+JLCPCB-specific workaround, but the electrical design confirms D1 should not be
+populated on any board.
 
 | Ref | Part | Package |
 |-----|------|---------|
 | D1 | MBR120VLSFT1G — Schottky diode | SOD-123 |
+
+U3, U4 and U5 are marked **Do Not Place** in the JLCPCB BOM only, because they have
+no LCSC equivalents. All other manufacturers source and assemble them without issues.
+
+| Ref | Part | Package |
+|-----|------|---------|
 | U3 | R-78C5.0-1.0 — RECOM 5 V DC/DC | SIP-3 THT |
 | U4 | R-78B12-2.0 — RECOM 12 V DC/DC | SIP-3 THT |
 | U5 | R-78B6.5-1.5 — RECOM 6.5 V DC/DC | SIP-3 THT |
 
-If ordering via JLCPCB, source these parts from Farnell, Mouser or RS Components and
+If ordering via JLCPCB, source U3/U4/U5 from Farnell, Mouser or RS Components and
 fit them after delivery.
-
-Note: D1 was originally marked DNP as a JLCPCB-specific workaround. It is assembled
-without issues by PCBWay, Beta LAYOUT and Eurocircuits.
 
 ## Directory structure
 

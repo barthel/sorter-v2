@@ -28,7 +28,7 @@ Source designs live in `electronics/KiCad/0_Adapter_Board/` and
 | Manufacturer | Service model | Notes |
 |---|---|---|
 | **JLCPCB** | Instant online quote, portal-driven | BOM uses LCSC part numbers; DNP parts (U3, U4, U5) have no LCSC equivalent and must be sourced and fitted separately; D1 is DNP for all manufacturers, see below |
-| **PCBWay** | Manual quote via portal/sales rep | Full turnkey assembly including U3/U4/U5; accepts panel-by-supplier for Adapter Board; D1 is DNP, confirmed with the manufacturer |
+| **PCBWay** | Manual quote via portal/sales rep | Full turnkey assembly including U3/U4/U5; accepts panel-by-supplier for Adapter Board; D1 and other DNP references confirmed with the manufacturer, see below |
 
 ### European manufacturers
 
@@ -39,13 +39,28 @@ Source designs live in `electronics/KiCad/0_Adapter_Board/` and
 
 ## DNP components
 
-D1 is **Do Not Place** across all manufacturers. It was previously assumed to be a
-JLCPCB-specific workaround, but the electrical design confirms D1 should not be
-populated on any board.
+D1 and the connectors/resistors below are **Do Not Place** across all manufacturers,
+confirmed against the design's reference BOM (Distribution Board V1.3). Several of
+them are individual references inside otherwise-populated groups (e.g. only J2 and
+J3 out of the J1/J2/J3 group, or 6 out of 50 resistors in the 10 kΩ group) — the
+PCBWay/Beta LAYOUT/Eurocircuits BOM files list the DNP references as separate line
+items so the manufacturer does not need to guess which references in a group are
+affected.
 
 | Ref | Part | Package |
 |-----|------|---------|
 | D1 | MBR120VLSFT1G — Schottky diode | SOD-123 |
+| J2, J3 | JST VH 2-pin connector | THT |
+| J4 | JST XA 4-pin connector | THT |
+| J12 | Pin Header 1x06 2.54mm | THT |
+| J13 | JST XA 10-pin connector | THT |
+| J14, J15, J19, J20 | 2.54-1×4P Female Header | THT |
+| J16, J18 | PM254V-11-06-H85 6-pin header | THT |
+| J24, J28, J32, J36, J40 | Pin Header 1x04 2.54mm | THT |
+| R33, R35, R37, R39, R41, R59 | 10 kΩ resistor | R_0603 |
+
+A1 (Raspberry Pi Pico) is also DNP but is not part of any manufacturer's BOM — it is
+a module the buyer plugs in themselves, not a component to be sourced or assembled.
 
 U3, U4 and U5 are marked **Do Not Place** in the JLCPCB BOM only, because they have
 no LCSC equivalents. All other manufacturers source and assemble them without issues.

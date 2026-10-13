@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Check a SorterOS image before anyone flashes it.
 
-  sudo ./check.py image out/sorteros-v4.1.0-2026-09-23.img
+  sudo ./check.py image out/sorteros-v4.1.2-rc-2026-09-23.img
       What the builder must have baked in, read straight off the image.
 
   ./check.py boot [--expect-ref sorter/stable/v0.2.0] [--expect-default-model]

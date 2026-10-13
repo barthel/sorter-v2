@@ -40,6 +40,7 @@ import datetime as dt
 import hashlib
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -60,6 +61,23 @@ PHASES = ["prep", "grow", "mount", "overlay", "portal", "chroot", "finalize", "z
 # larger than vendor. First-boot growfs on the Pi expands further to fill
 # whatever real SD card it's flashed to.
 GROW_MIB = 4096
+
+# Semantic Versioning 2.0.0, the grammar from https://semver.org.
+SEMVER = re.compile(
+    r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)"
+    r"(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?"
+    r"(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?"
+)
+
+
+def image_version(config: dict) -> str:
+    """The image version: [output] version if the config sets one, else
+    build/VERSION. Must be a valid SemVer 2.0.0 string (4.1.2, 4.1.2-rc.1)."""
+    version = config["output"].get("version") or (SCRIPT_DIR / "VERSION").read_text().strip()
+    if not SEMVER.fullmatch(version):
+        sys.exit(f"version {version!r} is not Semantic Versioning 2.0.0 "
+                 "(MAJOR.MINOR.PATCH[-prerelease][+build], e.g. 4.1.2 or 4.1.2-rc.1)")
+    return version
 
 @dataclass
 class BuildCtx:
@@ -721,6 +739,7 @@ def main() -> None:
 
     with open(args.config, "rb") as f:
         config = tomllib.load(f)
+    config["output"]["version"] = image_version(config)
 
     ref = args.ref or config["source"]["ref"]
 

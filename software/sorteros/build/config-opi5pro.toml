@@ -20,7 +20,6 @@ root_part = 2
 
 [output]
 dir = "out"
-version = "4.1.1-opi5pro.1"
 name = "sorteros-v{version}-opi5pro-{date}.img"
 
 [chroot]

@@ -29,45 +29,26 @@ J1,JST_VH_B2P-VH-FB-B_1x02_P3.96mm_Vertical,121.4,135.4,Top,-90.0,JST VH
 J10,PinHeader_1x02_P2.54mm_Vertical,53.0,45.725,Top,0,Generic 2.54mm
 J11,PinHeader_1x02_P2.54mm_Vertical,52.75,56.625,Top,0,Generic 2.54mm
 J12,PinHeader_1x06_P2.54mm_Vertical,74.0,124.05,Top,90.0,Conn_01x06
-J13,JST_XA_B10B-XASK-1-A_1x10_P2.50mm_Vertical,44.5,127.25,Top,0,Conn_01x10
-J14,HDR-TH_4P-P2.54-V-F,37.782,114.65,Top,0,2.54-1*4P Female
-J15,HDR-TH_4P-P2.54-V-F,50.492,114.625,Top,0,2.54-1*4P Female
-J16,HDR-TH_6P-P2.54-V-F,87.2,108.275,Top,90.0,PM254V-11-06-H85
 J17,IDC-Header_2x08_P2.54mm_Vertical,62.17,138.29,Top,90.0,Conn_02x08
-J18,HDR-TH_6P-P2.54-V-F,28.907,108.275,Top,90.0,PM254V-11-06-H85
-J19,HDR-TH_4P-P2.54-V-F,65.742,114.625,Top,0,2.54-1*4P Female
-J2,JST_VH_B2P-VH-FB-B_1x02_P3.96mm_Vertical,99.138,133.65,Top,0,JST VH
-J20,HDR-TH_4P-P2.54-V-F,78.442,114.625,Top,0,2.54-1*4P Female
 J21,PinHeader_1x03_P2.54mm_Vertical,112.95,37.9,Top,90.0,Jumper Pins
 J22,PinHeader_1x03_P2.54mm_Vertical,112.99,46.4,Top,90.0,Jumper Pins
 J23,JST_PH_B4B-PH-K_1x04_P2.00mm_Vertical,151.74,42.0,Top,-90.0,JST PH
-J24,PinHeader_1x04_P2.54mm_Vertical,145.94,41.19,Top,0,Generic 2.54mm
 J25,PinHeader_1x03_P2.54mm_Vertical,112.25,59.9,Top,90.0,Jumper Pins
 J26,PinHeader_1x03_P2.54mm_Vertical,112.21,68.6,Top,90.0,Jumper Pins
 J27,JST_PH_B4B-PH-K_1x04_P2.00mm_Vertical,151.8,66.4,Top,-90.0,JST PH
-J28,PinHeader_1x04_P2.54mm_Vertical,146.0,65.59,Top,0,Generic 2.54mm
 J29,PinHeader_1x03_P2.54mm_Vertical,112.17,84.492,Top,90.0,Jumper Pins
-J3,JST_VH_B2P-VH-FB-B_1x02_P3.96mm_Vertical,35.7,128.803,Top,-90.0,JST VH
 J30,PinHeader_1x03_P2.54mm_Vertical,112.17,93.1,Top,90.0,Jumper Pins
 J31,JST_PH_B4B-PH-K_1x04_P2.00mm_Vertical,151.8,90.865,Top,-90.0,JST PH
-J32,PinHeader_1x04_P2.54mm_Vertical,145.99,90.055,Top,0,Generic 2.54mm
 J33,PinHeader_1x03_P2.54mm_Vertical,112.06,109.08,Top,90.0,Jumper Pins
 J34,PinHeader_1x03_P2.54mm_Vertical,112.06,117.58,Top,90.0,Jumper Pins
 J35,JST_PH_B4B-PH-K_1x04_P2.00mm_Vertical,151.8,115.39,Top,-90.0,JST PH
-J36,PinHeader_1x04_P2.54mm_Vertical,145.84,114.58,Top,0,Generic 2.54mm
 J37,PinHeader_1x03_P2.54mm_Vertical,67.041,81.575,Top,-90.0,Jumper Pins
 J38,PinHeader_1x03_P2.54mm_Vertical,67.001,73.075,Top,-90.0,Jumper Pins
 J39,JST_PH_B4B-PH-K_1x04_P2.00mm_Vertical,28.251,77.475,Top,90.0,JST PH
-J4,JST_XA_B04B-XASK-1-A_1x04_P2.50mm_Vertical,52.25,137.75,Top,180.0,Conn_01x04
-J40,PinHeader_1x04_P2.54mm_Vertical,34.051,78.285,Top,180.0,Generic 2.54mm
 J5,PinHeader_1x03_P2.54mm_Vertical,42.225,34.29,Top,180.0,Generic 2.54mm
 J6,PinHeader_1x03_P2.54mm_Vertical,57.25,34.29,Top,180.0,Generic 2.54mm
 J8,PinHeader_1x02_P2.54mm_Vertical,31.532,45.998,Top,0,Generic 2.54mm
 J9,PinHeader_1x02_P2.54mm_Vertical,31.5,56.756,Top,0,Generic 2.54mm
-JP1,Jumper_2_NO,36.032,42.753,Top,0,Solder Jumper
-JP2,Jumper_2_NO,36.0,53.5,Top,0,Solder Jumper
-JP3,Jumper_2_NO,57.5,42.469,Top,0,Solder Jumper
-JP4,Jumper_2_NO,57.25,53.4,Top,0,Solder Jumper
 P1,PinSocket_1x08_P2.54mm_Vertical,123.65,36.11,Top,0,Female Socket 1x08
 P10,PinSocket_1x08_P2.54mm_Vertical,123.5,109.5,Top,0,Female Socket 1x08
 P11,PinSocket_1x02_P2.54mm_Vertical,126.04,109.5,Top,90.0,Female Socket 1x02
@@ -114,16 +95,11 @@ R3,R_0603,73.1,88.35,Top,0,10kΩ
 R30,R_0603,75.5,97.25,Top,180.0,10kΩ
 R31,R_0603,78.0,96.5,Top,90.0,200kΩ
 R32,R_0603,83.674,103.217,Top,90.0,10kΩ
-R33,R_0603,33.9,97.3,Top,-90.0,10kΩ
 R34,R_0603,33.9,100.5,Top,-90.0,10kΩ
-R35,R_0603,35.5,97.3,Top,-90.0,10kΩ
 R36,R_0603,35.5,100.49,Top,-90.0,10kΩ
-R37,R_0603,37.1,97.3,Top,-90.0,10kΩ
 R38,R_0603,37.1,100.49,Top,-90.0,10kΩ
-R39,R_0603,38.7,97.3,Top,-90.0,10kΩ
 R4,R_0603,102.0,50.0,Top,180.0,10kΩ
 R40,R_0603,38.7,100.5,Top,-90.0,10kΩ
-R41,R_0603,40.3,97.3,Top,-90.0,10kΩ
 R42,R_0603,40.3,100.5,Top,-90.0,10kΩ
 R43,R_0603,33.98,111.0,Top,-90.0,220Ω
 R44,R_0603,36.52,111.0,Top,-90.0,220Ω
@@ -142,7 +118,6 @@ R55,R_0603,74.632,111.0,Top,-90.0,220Ω
 R56,R_0603,77.172,111.0,Top,-90.0,220Ω
 R57,R_0603,79.712,111.0,Top,-90.0,220Ω
 R58,R_0603,82.252,111.0,Top,-90.0,220Ω
-R59,R_0603,41.9,97.3,Top,-90.0,10kΩ
 R6,R_0603,96.831,74.6,Top,90.0,1kΩ
 R60,R_0603,41.9,100.5,Top,-90.0,10kΩ
 R61,R_0603,113.2,40.9,Top,0,10kΩ

@@ -3,7 +3,7 @@ Comment,Designator,Footprint,LCSC Part #,MPN,Manufacturer,Mount,Qty,Description
 100uF,C11 C12 C13 C14 C15,CAP-SMD_BD6.3-L6.6-W6.6-LS7.4-FD,C2836442,,,SMT,5,"Polarized capacitor, US symbol"
 100Ω,R14 R15,R_0603,C22775,0603WAF1000T5E,UNI-ROYAL(Uniroyal Elec),SMT,2,100mW Thick Film Resistors 75V ±1% ±200ppm/°C 100Ω 0603 Chip Resistor - Surface Mount ROHS
 10kΩ,R11 R12 R13 R16 R19 R2 R20 R25 R26 R29 R3 R30 R32 R34 R36 R38 R4 R40 R42 R5 R60 R61 R62 R63 R64 R65 R66 R67 R68 R69 R70 R71 R73 R74 R75 R76 R79 R80 R81 R82 R85 R86 R87 R88,R_0603,C25804,0603WAF1002T5E,UNI-ROYAL(Uniroyal Elec),SMT,44,100mW Thick Film Resistors 75V ±100ppm/°C ±1% 10kΩ 0603 Chip Resistor - Surface Mount ROHS
-10kΩ,R33 R35 R37 R39 R41 R59,R_0603,,0603WAF1002T5E,UNI-ROYAL(Uniroyal Elec),SMT,6,10kΩ I2C address pull-up (DNP - do not populate)
+10kΩ,R33 R35 R37 R39 R41 R59,R_0603,,,,SMT,6,10kΩ I2C address pull-up (DNP - do not populate)
 10uF,C10,C_0603,C19702,CL10A106KP8NNNC,Samsung Electro-Mechanics,SMT,1,10V 10uF X5R ±10% 0603 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS
 10uF,C1 C2 C3 C4 C5 C6,C_0805,C440198,GRM21BR61H106KE43L,Murata Electronics,SMT,6,50V 10uF X5R ±10% 0805 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS
 180Ω,R21 R22 R27 R28,R_1206,C17924,1206W4F1800T5E,UNI-ROYAL(Uniroyal Elec),SMT,4,250mW Thick Film Resistors 200V ±100ppm/°C ±1% 180Ω 1206 Chip Resistor - Surface Mount ROHS

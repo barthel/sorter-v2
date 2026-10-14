@@ -52,7 +52,6 @@ affected.
 | D1 | MBR120VLSFT1G — Schottky diode | SOD-123 |
 | J2, J3 | JST VH 2-pin connector | THT |
 | J4 | JST XA 4-pin connector | THT |
-| J12 | Pin Header 1x06 2.54mm | THT |
 | J13 | JST XA 10-pin connector | THT |
 | J14, J15, J19, J20 | 2.54-1×4P Female Header | THT |
 | J16, J18 | PM254V-11-06-H85 6-pin header | THT |

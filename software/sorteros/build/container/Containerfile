@@ -5,6 +5,9 @@ FROM docker.io/library/ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive LC_ALL=C.UTF-8
 
+# Same pnpm as chroot_apt.sh; "latest" changes behaviour between builds.
+ARG PNPM_VERSION=12.11.2
+
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
         ca-certificates curl gnupg \
@@ -13,7 +16,7 @@ RUN apt-get update \
         p7zip-full xz-utils \
  && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
  && apt-get install -y --no-install-recommends nodejs \
- && npm install -g pnpm@latest \
+ && npm install -g "pnpm@${PNPM_VERSION}" \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 

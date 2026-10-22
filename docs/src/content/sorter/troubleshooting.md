@@ -140,6 +140,48 @@ The wizard's Controller Discovery step lists no controllers, and the issue banne
 
 ---
 
+## Cameras: a camera only offers small modes, or runs at 5 fps
+
+In the camera's **Picture** panel (**Picture tuning** in the setup wizard), the **Mode** list has nothing at 1280x720, only small sizes such as 640x480 at 5 fps down to 160x120. Or the size and frame rate in the bottom-right corner of its live view are well below [the modes in first setup]({{ '/sorter/first-setup/' | relative_url }}#picture-tuning). At 5 fps a channel misses small pieces such as Technic pins and pushes them on without seeing them.
+
+**Cause:** A slow USB link, not a faulty camera. The cameras on the hub share one cable to the Orange Pi, and when that link drops to its slowest speed, every camera on the hub only offers the small modes. A damaged cable between the hub and the Orange Pi has caused it. If whichever camera you plug into the hub gets the short list, it is the link.
+
+**Fix:** In order, checking the mode list after each:
+
+<ol class="numbered-steps">
+  <li>Push every USB plug fully home: each camera's lead at the camera and at the hub, and the hub's cable at both ends. The hub's power light should be on, and the light beside each camera's port steady.</li>
+  <li>Check the hub's cable goes into the Orange Pi's blue USB 3 port.</li>
+  <li>Replace the cable between the hub and the Orange Pi. The one that comes with the hub is easily damaged while routing it.</li>
+  <li>Plug the slow camera straight into a free USB port on the Orange Pi instead of the hub. Move one camera, not all of them: the hub has its own power so the cameras don't pull the Orange Pi's voltage down (<a href="{{ '/lab/usb/' | relative_url }}">why</a>).</li>
+</ol>
+
+After moving any camera, check each channel's page in **Settings** still shows its own camera. If not, press **Change camera** and pick the right one.
+
+**Verify:** The **Mode** list offers 1280x720 at 30 fps, and the corner of the live view shows it once picked.
+
+---
+
+## Lamps: a camera lamp stays dark
+
+A lamp stays off with its channel's **LED** panel set, or the panel's **Output** list is empty and says "No LED outputs are free to assign right now". The housing fan often stays still as well, because it runs off an LED port too.
+
+**Cause:** No LED port switches on by itself. Each one stays off until a channel has that port's output picked, and there are no outputs to pick until the machine's hardware is up. Once the board is switching the port, the fault is in the lamp's lead: the barrel plug and socket if you fitted them, a crimp, or the wires reversed.
+
+**Fix:** In order, checking the lamp after each:
+
+<ol class="numbered-steps">
+  <li><strong>If the Output list is empty,</strong> look at the machine's state in the top bar. In <strong>Standby</strong> or <strong>Error</strong> there are no outputs to offer. Open the menu there and pick <strong>Home</strong>, or <strong>Initialize without homing</strong> if you only want the lamps. Once it says <strong>Ready</strong> or <strong>Initialized</strong>, close the LED panel and open it again. Still empty in <strong>Ready</strong>: check the firmware version on <strong>Settings → Control board</strong>; it has to be v0.8.0 or newer.</li>
+  <li><strong>Pick the output for each lamp.</strong> On each channel's page in <strong>Settings</strong> (<strong>C-channel 2</strong>, <strong>C-channel 3</strong>, <strong>Classification channel</strong>), press <strong>LED</strong>, pick the <strong>Output</strong> for the port that channel's lamp is plugged into, and set <strong>Brightness</strong> above 0%. <code>J8</code> and <code>J9</code> are <strong>GPIO 1</strong>; <code>J10</code> and <code>J11</code> are <strong>GPIO 6</strong>. Brightness with no output picked does nothing, and the housing fan only runs while some channel has <strong>GPIO 6</strong>.</li>
+  <li><strong>Check each plug at the board:</strong> red to <code>+V</code>, black to <code>GND</code>, as in <a href="{{ '/hardware/electronics/connecting/' | relative_url }}#step-4">connecting the components, step 4</a>.</li>
+  <li><strong>See whether the board is switching the port.</strong> With the lamp plugged in and a multimeter on DC volts, put the probes on the lamp's two wires where they meet the strip. Read it with <strong>Brightness</strong> at 0%, then at 100%. About 0 V then about 24 V means the board is switching it and the fault is in the lead; carry on below. The same reading at both settings means the board is not switching that port: <a href="#escalate">escalate</a>. Measure across the two wires, not from one wire to ground: the red wire has 24 V on it all the time, so 24 V there proves nothing.</li>
+  <li><strong>If you fitted the barrel plug and socket in the lamp's lead,</strong> take them out and join the lamp's wires to the board cable directly, red to red and black to black.</li>
+  <li><strong>Check the rest of the lead:</strong> tug each crimp and look for a wire that pulls out, check each wire beeps through end to end on the <a href="{{ '/hardware/helpers/multimeter/' | relative_url }}#continuity-for-tracing-a-cable">continuity setting</a>, and check red goes to the strip's <code>+</code> and black to its <code>-</code>.</li>
+</ol>
+
+**Verify:** Each lamp comes on at the brightness you set, and the housing fan runs.
+
+---
+
 ## Carousel keeps rotating past the part — classification never completes
 
 **Cause:** The classification detector returns `found=false` every attempt. Two real causes: OpenRouter API key missing or rate-limited, or the classification region polygon is misaligned with where the carousel actually presents parts.

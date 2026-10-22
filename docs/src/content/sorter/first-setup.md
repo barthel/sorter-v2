@@ -9,7 +9,6 @@ slug: sorter-first-setup
 kicker: SorterOS — Operate
 lede: The setup wizard step by step, from opening the machine's UI in a browser to a machine ready for its first sort run.
 permalink: /sorter/first-setup/
-og_image: https://assets.basically.website/sorter-docs/sorter-dashboard-ready-brickcycle-w1600-ac437d39209c.jpg
 warning: >-
   **SorterOS changes quickly.** This page describes what each step does, but a
   button's name, or where it is, may have changed since this page was written.
@@ -101,12 +100,9 @@ You can change it later under **Settings** → **Connection & Appearance** → *
 
 ## Step 3: Controller discovery
 
-The wizard lists the USB controllers it can see, and uses the ones it recognises. On a machine built from these docs that is two devices:
+The wizard lists the USB controllers it can see, and uses the ones it recognises. On a machine built from these docs that is one device: the control board, which drives the chute, all four channel rotors and the flap servos. There is no separate servo device to find.
 
-- the control board, which drives the chute and all four channel rotors,
-- the Waveshare servo bus.
-
-A recognised device has a green **Controller** or **Servo Bus** badge, its board type, and the port it is on.
+A recognised device has a green **Controller** badge, its board type, and the port it is on.
 
 **Nothing listed, or the control board missing?** In order:
 
@@ -150,9 +146,13 @@ The chute has a sensor at its home position. Here you check that the machine rea
 <ol class="numbered-steps">
   <li>Trigger the chute's endstop by hand. The <strong>Chute endstop</strong> row should read <strong>Triggered</strong>.</li>
   <li>If it stays <strong>Not triggered</strong>, press <strong>Flip the polarity</strong> and trigger it again.</li>
-  <li>Press <strong>Find the chute endstop</strong>. The chute turns until it finds its sensor and stops. If it runs the wrong way, press <strong>Flip the direction</strong> and try again.</li>
+  <li>Press <strong>Find the chute endstop</strong>. The chute turns until it finds its sensor and stops. Seen from above, it should turn counter-clockwise, so it reaches the sensor from the clockwise side. If it runs the other way, press <strong>Stop the motion</strong>, then <strong>Flip the direction</strong>, and try again.</li>
   <li>Press <strong>Chute endstop and geometry look correct</strong>.</li>
 </ol>
+
+<div class="img-row">
+  <figure><img src="https://assets.basically.website/sorter-docs/sorter-first-setup-step5-chute-homing-direction-full-b77a67a68ff7.png" alt="Top-down diagram of the machine: the chute in the middle of a ring of bins, its funnel on one side and a hammer-shaped tab on the other. A green arrow takes the funnel counter-clockwise to where it ends at home, a dashed outline at the section left of the control board, while the hammer turns counter-clockwise to the home switch above the PSU. A crossed-out red arrow off the funnel turns clockwise."><figcaption>Which way the chute should turn when it finds the endstop, seen from above. Watch the funnel: the hammer on the far side of the chute is what presses the switch. <cite>Diagram. Render: Balloon.</cite></figcaption></figure>
+</div>
 
 **Stop the motion** halts the chute at once. **Show the wiring** shows which header on the control board the endstop plugs into.
 
@@ -160,11 +160,33 @@ Leave **First bin center** and **Pillar width** at the values already in the fie
 
 ## Step 6: Servo configuration
 
-The bin doors are driven by servos on one bus, and each servo has to be told which storage layer it belongs to.
+Each storage layer has a flap in the chute, driven by a servo. Closed, the flap crosses the chute and pieces slide into that layer's bins. Open, it lies flat in the chute wall and pieces fall past to the layers below.
 
-The wizard discovers the servos on the bus, then takes them one at a time: calibrate the door, assign it to a layer, move to the next. Work up the machine in the order that suits you, but give every layer a servo.
+On the standard control board the servos run from the board itself. The step says **No Waveshare servo bus found, so a PCA9685 on a control board is assumed**, and shows the same flap panel as **Settings → Storage layers**.
 
-**Continue** is blocked with "Configure servos before continuing" until the assignment is complete. When it is, press **Servo setup looks correct**.
+<ol class="numbered-steps">
+  <li>Press <strong>Add a layer</strong> once for each layer, and set each layer's <strong>Bins</strong> to the bins fitted on it.</li>
+  <li>Turn on <strong>Advanced</strong>, beside <strong>Add a layer</strong>. Each layer's <strong>Channel</strong> box only shows while it is on. Pick the servo channel that layer's flap is plugged into.</li>
+  <li>Press <strong>Save the layers</strong>. Then restart the backend: the <strong>⋯</strong> menu at the top right, then <strong>Restart the backend</strong>. A layer you added, or whose <strong>Bins</strong> you changed, only takes effect after a restart. Homing alone is not enough, even though the page says to home.</li>
+  <li>When the page is back, home the machine from the same menu: <strong>Home</strong> (<strong>Re-home</strong> if it has homed before). A flap cannot move until then.</li>
+  <li>For each layer, move the flap with the arrows until it lies flat in the chute wall, then press <strong>Lock open</strong>. Then move it until it crosses the chute and nothing can fall past, and press <strong>Lock closed</strong>. The layer reads <strong>Calibrated</strong> once both are locked.</li>
+</ol>
+
+**You need a torch** to see the flaps inside the chute. It is easier with one section opened up: in the section the chute points at, lift out the bins and slide each layer's funnel off its brackets. Neither is screwed in. Then shine the torch in at the flaps. Afterwards, slide each funnel back until it meets the core and push every bin fully back into its bay.
+
+**Never turn a flap by hand.** The servo's gearbox barely turns backwards, so forcing a flap rounds off the teeth inside the horn, or breaks the servo so that it spins freely. Move it only with the arrows.
+
+**The first press swings the flap to one end.** Until a flap has moved since the machine was switched on, the machine does not know where it is, and the first press of either arrow sends it to 0° at full speed. Keep your fingers out of the chute. If it hums or clicks there, press the right arrow (**Move toward a higher angle**) until it stops.
+
+**Watch the flap, not the arrows.** One arrow moves it towards a lower angle and the other towards a higher one, and which of those opens it depends on how its servo sits.
+
+**A clicking noise means you have gone too far.** Step back the other way until it stops, then lock the angle there. Never leave a servo pushing against the chute wall.
+
+A flap that will not reach open or closed, or a servo that spins freely: [troubleshooting]({{ '/sorter/troubleshooting/' | relative_url }}#flaps-a-flap-will-not-reach-open-or-closed-or-its-servo-spins-freely).
+
+**A choice that does not stay after a save was refused.** The reason is at the very bottom of the page, below the speed settings.
+
+**Continue** is blocked with "Configure servos before continuing" until the servos are set up. When every layer is calibrated, press **Servo setup looks correct**.
 
 ## Step 7: Cameras
 
@@ -256,9 +278,7 @@ Press **Open Dashboard**. The wizard is done.
 
 The dashboard, with every camera live and its zones drawn, the machine's name at the top, and **Ready** beside it. Nothing has been sorted yet, so **Recent pieces** is empty.
 
-<div class="img-row">
-  <figure><img src="https://assets.basically.website/sorter-docs/sorter-dashboard-ready-brickcycle-w1600-ac437d39209c.jpg" alt="The SorterOS dashboard after setup: C-channel 2, C-channel 3 and Classification channel tiles showing live views with their zones, the machine name and Ready at the top, and No pieces yet under Recent pieces"><figcaption>A machine set up and ready. The profile at the top right is picked later, at your first sort run. <cite>Screenshot courtesy of BrickCycleAlice.</cite></figcaption></figure>
-</div>
+<div class="img-placeholder">Screenshot of the SorterOS dashboard on a machine with stock camera mounts, straight after setup: the three camera tiles live with their zones drawn, the machine name and Ready at the top, and nothing under Recent pieces.</div>
 
 ## Settings worth a look
 

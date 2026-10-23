@@ -223,7 +223,7 @@ class TestDefaultProfiles:
     def test_every_machine_gets_the_defaults_it_can_run(
         self, client: TestClient, auth_headers: dict[str, str], db: Session, machine_token: str, catalog
     ) -> None:
-        assert len(default_profiles.ensure_default_profiles(db)) == 3
+        assert len(default_profiles.ensure_default_profiles(db)) == 6
         # a second start with the same definitions publishes nothing new
         assert default_profiles.ensure_default_profiles(db) == []
         machine = {"Authorization": f"Bearer {machine_token}"}
@@ -235,7 +235,29 @@ class TestDefaultProfiles:
         new_sorter = client.get(
             "/api/machine/profiles/library?features=program,color_fallback,kit_cascade", headers=machine
         ).json()["profiles"]
+        # the profiles that name the bins need a sorter that says it can
         assert [profile["name"] for profile in new_sorter] == ["BrickLink categories", "Colors", "Colors and basic pieces"]
+
+        naming_sorter = client.get(
+            "/api/machine/profiles/library?features=program,color_fallback,kit_cascade,bin_sort_by", headers=machine
+        ).json()["profiles"]
+        assert [profile["name"] for profile in naming_sorter][3:] == [
+            "One bin per part",
+            "One bin per color",
+            "One bin per part and color (LOT)",
+        ]
+        by_part_and_color = naming_sorter[5]["latest_published_version"]["id"]
+        lot = client.get(
+            f"/api/machine/profiles/versions/{by_part_and_color}/artifact?format=program&features=program,bin_sort_by",
+            headers=machine,
+        )
+        assert lot.status_code == 200, lot.text
+        assert lot.json()["artifact"]["bin_sort_by"] == ["part", "color"]
+        refused_lot = client.get(
+            f"/api/machine/profiles/versions/{by_part_and_color}/artifact?format=program&features=program",
+            headers=machine,
+        )
+        assert refused_lot.status_code == 409
 
         colors = next(profile for profile in new_sorter if profile["name"] == "Colors")
         version_id = colors["latest_published_version"]["id"]

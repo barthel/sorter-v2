@@ -110,3 +110,35 @@ def test_unreadable_sort_by_falls_back_to_category(monkeypatch) -> None:
 
     monkeypatch.setattr(toml_config, "getBinAssignmentConfig", boom)
     assert positioning._binSortBy() == ("category",)
+
+
+def _applied(monkeypatch, tmp_path, artifact: dict, start: list[str]) -> tuple[list[str], list[str]]:
+    from server.routers import sorting_profiles
+
+    monkeypatch.setenv("MACHINE_SPECIFIC_PARAMS_PATH", str(tmp_path / "machine.toml"))
+    toml_config.setBinAssignmentConfig({"sort_by": start})
+    cleared: list[str] = []
+    monkeypatch.setattr(
+        sorting_profiles, "clear_bin_category_assignments", lambda scope: cleared.append(scope)
+    )
+    now = sorting_profiles._apply_bin_sort_by(artifact, already_cleared=False)
+    assert toml_config.getBinAssignmentConfig()["sort_by"] == now
+    return now, cleared
+
+
+def test_a_profile_sets_the_naming_and_clears_the_bins_it_made_stale(monkeypatch, tmp_path) -> None:
+    now, cleared = _applied(monkeypatch, tmp_path, {"bin_sort_by": ["color", "part"]}, ["category"])
+    assert now == ["part", "color"]
+    assert cleared == ["all"]
+
+
+def test_a_profile_without_naming_goes_back_to_category(monkeypatch, tmp_path) -> None:
+    now, cleared = _applied(monkeypatch, tmp_path, {}, ["part"])
+    assert now == ["category"]
+    assert cleared == ["all"]
+
+
+def test_the_same_naming_keeps_the_bins(monkeypatch, tmp_path) -> None:
+    now, cleared = _applied(monkeypatch, tmp_path, {"bin_sort_by": ["part"]}, ["part"])
+    assert now == ["part"]
+    assert cleared == []

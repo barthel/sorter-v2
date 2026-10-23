@@ -60,6 +60,16 @@ The optional `[display]` table makes the boot readable on a small HDMI panel:
 | `fbcon_font` | console font (`VGA8x8` or `VGA8x16`; the vendor kernel has only these two) |
 | `verbosity` | kernel log level in `orangepiEnv.txt` (the vendor image uses 1, which prints almost nothing) |
 
+The optional `[npu]` table (`url`, `filename`, `sha256`) replaces the vendor's
+NPU runtime. The Orange Pi 5 Pro image ships `librknnrt` 1.4.0, which cannot run
+the 2.x models Hive hands out. `rknn-toolkit-lite2` and the backend's NPU check
+read `/usr/lib/librknnrt.so` and no other path, so the `overlay` phase downloads
+the file into `cache/` (sha256-checked) and installs it there. The vendor file
+stays as `librknnrt.so.bak`. If a dpkg package owns the path, `dpkg-divert`
+keeps a later upgrade from putting the old file back (the vendor file is then
+`librknnrt.so.distrib`). Keep the version in line with `rknn-toolkit-lite2` in
+`software/sorter/backend/pyproject.toml`.
+
 ## What is NOT in the image
 
 The Sorter software itself. First boot clones the repo (blobless), checks out

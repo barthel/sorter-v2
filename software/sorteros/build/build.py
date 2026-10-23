@@ -46,6 +46,7 @@ import subprocess
 import sys
 import time
 import tomllib
+import urllib.request
 import zipfile
 from dataclasses import dataclass
 from pathlib import Path
@@ -349,6 +350,7 @@ def phase_overlay(ctx: BuildCtx) -> None:
     _set_display(ctx)
     _set_wifi_country(ctx)
     _set_timezone_utc(ctx)
+    _install_librknnrt(ctx)
 
     # Tailscale auth key is intentionally NOT baked in at build time.
     # It is supplied at setup time via the AP captive portal (../portal/),
@@ -486,6 +488,63 @@ def _set_display(ctx: BuildCtx) -> None:
 # ─── chroot ────────────────────────────────────────────────────────────────
 
 CHROOT_BINDS = ["dev", "proc", "sys", "dev/pts"]
+
+
+def _sha256_file(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(8 * 1024 * 1024), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _install_librknnrt(ctx: BuildCtx) -> None:
+    """Put the NPU runtime named in [npu] at /usr/lib/librknnrt.so.
+
+    The vendor image ships librknnrt 1.4.0, which cannot run the 2.x models
+    Hive hands out; rknn-toolkit-lite2 and the backend's NPU check both look
+    at that one path, so the new file has to replace the old one there. The
+    old file is kept as librknnrt.so.bak. If a dpkg package owns the path, a
+    local diversion stops a later upgrade from putting the old file back."""
+    npu = ctx.config.get("npu")
+    if not npu:
+        return
+    if not is_mounted(ctx.mnt):
+        sys.exit("rootfs not mounted — run --phase mount first")
+
+    lib = ctx.cache_dir / npu["filename"]
+    if not lib.exists() or _sha256_file(lib) != npu["sha256"]:
+        log(f"downloading {npu['url']}")
+        ctx.cache_dir.mkdir(parents=True, exist_ok=True)
+        part = lib.with_name(lib.name + ".part")
+        with urllib.request.urlopen(npu["url"], timeout=60) as resp, part.open("wb") as f:
+            shutil.copyfileobj(resp, f)
+        got = _sha256_file(part)
+        if got != npu["sha256"]:
+            part.unlink()
+            sys.exit(f"{npu['url']} sha256 {got} != expected {npu['sha256']}")
+        part.replace(lib)
+
+    target = "/usr/lib/librknnrt.so"
+    dst = ctx.mnt / target.lstrip("/")
+    owner = subprocess.run(["chroot", str(ctx.mnt), "dpkg-query", "-S", target],
+                           capture_output=True, text=True)
+    if owner.returncode == 0:
+        diverted = subprocess.run(["chroot", str(ctx.mnt), "dpkg-divert", "--list", target],
+                                  capture_output=True, text=True, check=True).stdout.strip()
+        if not diverted:
+            log(f"{target} belongs to a package ({owner.stdout.split(':')[0]}); diverting it")
+            run(["chroot", str(ctx.mnt), "dpkg-divert", "--local", "--rename", "--add", target])
+    elif dst.exists() or dst.is_symlink():
+        bak = dst.with_name(dst.name + ".bak")
+        if not bak.exists():
+            dst.rename(bak)
+
+    dst.unlink(missing_ok=True)
+    shutil.copyfile(lib, dst)
+    dst.chmod(0o755)
+    found = re.search(rb"librknnrt version: [^\x00\n]*", dst.read_bytes())
+    log(f"installed {target}: {found.group(0).decode() if found else 'no version string'}")
 
 
 def _bind_mounts_up(ctx: BuildCtx) -> None:

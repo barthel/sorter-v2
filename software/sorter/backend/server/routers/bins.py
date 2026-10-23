@@ -297,9 +297,11 @@ def auto_assign_bins(*, overlap: bool, window_days: float = 7.0) -> dict[str, An
         if not part_id:
             continue
         cat = resolve(part_id, color_id if color_id else "any_color")
-        if not cat or cat == MISC_CATEGORY:
+        # Misc and the default category are no bins to sort into, but only when
+        # the bin is named by category: by part or color they still get one.
+        if not cat:
             continue
-        if BIN_KEY_CATEGORY in sort_by and cat == default_cat:
+        if BIN_KEY_CATEGORY in sort_by and (cat == MISC_CATEGORY or cat == default_cat):
             continue
         key = binKey(sort_by, cat, part_id, color_id)
         if key != MISC_CATEGORY:

@@ -103,11 +103,27 @@ pieces to the kit's bin.
 ## Hive's default profiles
 
 `app/services/default_profiles.py` defines profiles every machine gets
-without saving them: BrickLink categories, Colors, and Colors and basic
-pieces. Hive keeps them itself (owned by a user no one signs in as), public,
+without saving them: BrickLink categories, Colors, Colors and basic pieces,
+and three that also say what a bin is named by (below). Hive keeps them itself (owned by a user no one signs in as), public,
 with `system_key` and `default_rank`. On every start it compiles each one and
 publishes a new version when the result changed (a new definition, or a
 catalog update). A sorter with no profile starts on the first one.
+
+### Naming the bins
+
+A document may carry `bin_sort_by`: a list of `category`, `part` and `color`
+(`compiler.normalize_bin_sort_by`; `["category"]` is the default and is
+dropped). It goes into the artifact as `bin_sort_by` and the version
+`requires` the `bin_sort_by` feature, so a sorter that cannot name bins this
+way is not offered the profile. The rules and fallback still decide a piece's
+category, which stays what its record shows; `bin_sort_by` only decides which
+bin it lands in. When a sorter activates a profile it sets its `[bins]
+sort_by` from this list (or back to category when the list is absent) and
+clears its bin assignments if that changed them.
+
+The three defaults that use it have no rules: `One bin per part`
+(`["part"]`), `One bin per color` (`["color"]`) and `One bin per part and
+color (LOT)` (`["part", "color"]`).
 
 ## For assistants
 

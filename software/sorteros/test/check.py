@@ -130,6 +130,14 @@ def check_image(img: Path) -> None:
         check(localtime.is_symlink() and str(localtime.readlink()).endswith("/Etc/UTC"),
               "time zone starts at UTC, not the vendor's Asia/Shanghai")
         check(not any((mnt / "usr/local/sbin").rglob("__pycache__")), "no compiled Python in the overlay")
+        # build.py keeps the vendor's NPU runtime as .bak (or .distrib, when a
+        # package owns the file and dpkg diverts it) when [npu] replaces it.
+        rknn = mnt / "usr/lib/librknnrt.so"
+        if (mnt / "usr/lib/librknnrt.so.bak").exists() or (mnt / "usr/lib/librknnrt.so.distrib").exists():
+            found = re.search(rb"librknnrt version: (\d+\.\d+\.\d+)", rknn.read_bytes()) if rknn.is_file() else None
+            check(found is not None and found.group(1).split(b".")[0] != b"1",
+                  "NPU runtime librknnrt is 2.x (the vendor's 1.4.0 cannot run Hive's models)",
+                  found.group(1).decode() if found else "missing")
         daemon = mnt / "usr/local/sbin/sorteros-firstboot.py"
         try:
             compile(daemon.read_text(), str(daemon), "exec")

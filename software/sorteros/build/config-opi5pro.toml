@@ -61,3 +61,12 @@ wifi_overlay = ""
 video = "HDMI-A-1:640x480@60"
 fbcon_font = "VGA8x16"
 verbosity = 7
+
+[npu]
+# The vendor image ships librknnrt 1.4.0 (2022), which cannot run the 2.x models
+# Hive hands out. rknn-toolkit-lite2 2.3.2 and the backend's NPU check both use
+# /usr/lib/librknnrt.so and nothing else, so build.py replaces that file with
+# the runtime of the same release (Rockchip publishes it only on GitHub).
+url = "https://raw.githubusercontent.com/airockchip/rknn-toolkit2/v2.3.2/rknpu2/runtime/Linux/librknn_api/aarch64/librknnrt.so"
+filename = "librknnrt-2.3.2.so"
+sha256 = "d31fc19c85b85f6091b2bd0f6af9d962d5264a4e410bfb536402ec92bac738e8"

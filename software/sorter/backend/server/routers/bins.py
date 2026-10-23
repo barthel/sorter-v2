@@ -49,6 +49,8 @@ from irl.parse_user_toml import DEFAULT_CHUTE_FIRST_BIN_CENTER, DEFAULT_CHUTE_PI
 from server import shared_state
 from server.routers.chute import _chute_move, _chute_settings_from_config
 from server.routers.steppers import _ensure_not_homing
+from bin_key import CATEGORY as BIN_KEY_CATEGORY, PART as BIN_KEY_PART, binKey, parseKey
+from piece_records import partNames
 from sorting_profile import MISC_CATEGORY, categoryResolver
 from subsystems.distribution.chute import BinAddress
 from toml_config import getBinAssignmentConfig, setBinAssignmentConfig
@@ -266,14 +268,20 @@ def auto_assign_bins(*, overlap: bool, window_days: float = 7.0) -> dict[str, An
     default_cat = str(artifact.get("default_category_id", MISC_CATEGORY))
     cat_meta = artifact.get("categories", {}) or {}
 
+    sort_by = getBinAssignmentConfig()["sort_by"]
     keys = get_distributed_part_keys_since(time.time() - window_days * 86400.0)
     tally: Counter[str] = Counter()
     for part_id, color_id in keys:
         if not part_id:
             continue
         cat = resolve(part_id, color_id if color_id else "any_color")
-        if cat and cat != MISC_CATEGORY and cat != default_cat:
-            tally[cat] += 1
+        if not cat or cat == MISC_CATEGORY:
+            continue
+        if BIN_KEY_CATEGORY in sort_by and cat == default_cat:
+            continue
+        key = binKey(sort_by, cat, part_id, color_id)
+        if key != MISC_CATEGORY:
+            tally[key] += 1
     ranked = [cat for cat, _ in tally.most_common()]
 
     flags = _current_not_in_inventory()
@@ -334,6 +342,7 @@ def auto_assign_bins(*, overlap: bool, window_days: float = 7.0) -> dict[str, An
         "categories_ranked": len(ranked),
         "total_pieces": sum(tally.values()),
         "overlap": overlap,
+        "sort_by": list(sort_by),
         "window_days": window_days,
         "assignments": assignments,
     }
@@ -659,11 +668,25 @@ def get_bins_layout() -> Dict[str, Any]:
             except (IndexError, TypeError):
                 bin_out["not_in_inventory"] = False
 
+    # Names for the parts bins are named by, so the UI can show "Brick 2 x 4"
+    # rather than the part number.
+    part_ids = [
+        parseKey(category_id).get(BIN_KEY_PART)
+        for layer_out in layers_out
+        for bin_out in layer_out["bins"]
+        for category_id in bin_out["category_ids"]
+    ]
+    try:
+        part_names = partNames([part_id for part_id in part_ids if part_id])
+    except Exception:
+        part_names = {}
+
     return {
         "ok": True,
         "layers": layers_out,
         "current_angle": current_angle,
         "active_layer": active_layer,
+        "part_names": part_names,
     }
 
 
@@ -674,7 +697,10 @@ def get_bins_settings() -> Dict[str, Any]:
 
 @router.post("/api/bins/settings")
 def set_bins_settings(payload: Dict[str, Any]) -> Dict[str, Any]:
-    merged = setBinAssignmentConfig(payload or {})
+    try:
+        merged = setBinAssignmentConfig(payload or {})
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
     return {"ok": True, **merged}
 
 

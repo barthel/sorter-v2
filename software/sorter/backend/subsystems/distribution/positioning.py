@@ -12,6 +12,7 @@ from irl.config import IRLInterface
 from global_config import GlobalConfig
 from sorting_profile import SortingProfile, MISC_CATEGORY
 from bin_layout_store import set_bin_categories
+from bin_key import binKey
 import db
 from defs.events import PauseCommandData, PauseCommandEvent
 from defs.known_object import PieceStage
@@ -45,6 +46,15 @@ def _allowMultiCategoryBins() -> bool:
         )
     except Exception:
         return False
+
+
+def _binSortBy() -> tuple[str, ...]:
+    try:
+        from toml_config import getBinAssignmentConfig
+
+        return tuple(getBinAssignmentConfig()["sort_by"])
+    except Exception:
+        return ("category",)
 
 
 def _persistBinCategories(layout: DistributionLayout) -> None:
@@ -158,6 +168,15 @@ class Positioning(BaseState):
                 )
                 category_id = high_value_category
                 piece.high_value_routed = True
+            # What the bin is named by: the category, the part, the color or a
+            # mix (machine.toml [bins] sort_by). A high-value piece always goes
+            # to its category's bin; a piece with no part is misc.
+            if high_value_category is not None:
+                route_key = category_id
+            elif piece.part_id is None:
+                route_key = MISC_CATEGORY
+            else:
+                route_key = binKey(_binSortBy(), category_id, piece.part_id, piece.color_id)
             # Inventory routing: a piece absent from the active .bsx (resolved at
             # classification time via a live BrickLink-id lookup) routes within the
             # parallel not-in-inventory bin pool, sub-sorted by its normal category.
@@ -191,7 +210,7 @@ class Positioning(BaseState):
                 return DistributionState.READY
 
             address, _ = self._findOrAssignBinForCategory(
-                category_id, not_in_inventory=route_not_in_inventory
+                route_key, not_in_inventory=route_not_in_inventory
             )
             if address is None and self._servo_bus_pause_enqueued:
                 # Fatal: the servo bus is offline, so every layer is
@@ -205,9 +224,9 @@ class Positioning(BaseState):
                 # pass through to the bottom tray without claiming a real bin
                 # and without raising the operator no-bin incident.
                 if (
-                    category_id != MISC_CATEGORY
+                    route_key != MISC_CATEGORY
                     and not self._consumeNoBinPassthroughApproval(piece)
-                    and self._raiseNoBinAvailableIncident(piece, category_id)
+                    and self._raiseNoBinAvailableIncident(piece, route_key)
                 ):
                     self._setOccupancyState("positioning.no_bin_incident")
                     return DistributionState.IDLE
@@ -216,9 +235,9 @@ class Positioning(BaseState):
                 # through to the bottom tray. Finalize the piece record
                 # via SENDING so stats/events stay consistent.
                 self.logger.warning(
-                    f"Positioning: no bin for category {category_id} — passthrough to bottom"
+                    f"Positioning: no bin for {route_key} — passthrough to bottom"
                 )
-                self._raiseBinsFullAlert(category_id)
+                self._raiseBinsFullAlert(route_key)
                 self._openAllDoorsForPassthrough()
                 piece.stage = PieceStage.distributing
                 piece.distributing_at = time.time()

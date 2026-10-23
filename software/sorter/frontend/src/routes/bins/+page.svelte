@@ -9,11 +9,14 @@
 	import ColumnsPanel from '$lib/components/bins/ColumnsPanel.svelte';
 	import DiscardBinCard from '$lib/components/bins/DiscardBinCard.svelte';
 	import LayerPanel from '$lib/components/bins/LayerPanel.svelte';
+	import { BIN_KEY_COMPONENTS, BIN_KEY_LABELS, normalizeSortBy, type BinKeyComponent } from '$lib/components/bins/binKey';
+	import { setPartNames } from '$lib/components/bins/partNames.svelte';
 	import { categoryLabel } from '$lib/components/bins/pieces';
 	import SnapshotsModal from '$lib/components/bins/SnapshotsModal.svelte';
 	import type { BinContents, BinInfo, LayerInfo, SetMeta, SetProgressSummary } from '$lib/components/bins/types';
 	import Alert from '$lib/components/ui/Alert.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
+	import Checkbox from '$lib/components/ui/Checkbox.svelte';
 	import EmptyState from '$lib/components/ui/EmptyState.svelte';
 	import Modal from '$lib/components/ui/Modal.svelte';
 	import PageHeader from '$lib/components/ui/PageHeader.svelte';
@@ -22,6 +25,7 @@
 	import Skeleton from '$lib/components/ui/Skeleton.svelte';
 	import Switch from '$lib/components/ui/Switch.svelte';
 	import { getMachinesContext } from '$lib/machines/context';
+	import { fetchLegoColors } from '$lib/pieces/colors';
 	import { sortingProfileStore } from '$lib/stores/sortingProfile.svelte';
 	import { onMount } from 'svelte';
 
@@ -63,6 +67,8 @@
 	let pointingSectionKey = $state<string | null>(null);
 	let allowMultiCategory = $state(false);
 	let savingMultiCategory = $state(false);
+	let sortBy = $state<BinKeyComponent[]>(['category']);
+	let savingSortBy = $state(false);
 	let autoAssignBusy = $state(false);
 	let autoAssignResult = $state<string | null>(null);
 	let contentsByKey = $state<Record<string, BinContents>>({});
@@ -126,6 +132,7 @@
 			if (!res.ok) throw new Error(`HTTP ${res.status}`);
 			const data = await res.json();
 			layers = data.layers ?? [];
+			setPartNames(data.part_names);
 			currentAngle = data.current_angle;
 			activeLayer = data.active_layer;
 			error = null;
@@ -142,8 +149,43 @@
 			if (!res.ok) return;
 			const data = await res.json();
 			allowMultiCategory = Boolean(data.allow_multiple_categories_per_bin);
+			sortBy = normalizeSortBy(data.sort_by);
 		} catch {
 			// Keep last known setting on transient failures.
+		}
+	}
+
+	// What a bin is named by: the category, the part, the color or a mix. At
+	// least one stays on. Bins keep what they hold; to start a new pass (say
+	// category first, then part, then color), change this and reset the bins.
+	async function toggleSortBy(component: BinKeyComponent, on: boolean) {
+		if (savingSortBy) return;
+		const next = BIN_KEY_COMPONENTS.filter((c) => (c === component ? on : sortBy.includes(c)));
+		if (next.length === 0) {
+			sortBy = [...sortBy];
+			return;
+		}
+		savingSortBy = true;
+		statusMsg = '';
+		error = null;
+		try {
+			const res = await fetch(`${baseUrl()}/api/bins/settings`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ sort_by: next })
+			});
+			if (!res.ok) {
+				const detail = await res.json().catch(() => null);
+				throw new Error(detail?.detail ?? `HTTP ${res.status}`);
+			}
+			const data = await res.json();
+			sortBy = normalizeSortBy(data.sort_by);
+			statusMsg = `Bins are now named by ${sortBy.map((c) => BIN_KEY_LABELS[c].toLowerCase()).join(' + ')}.`;
+		} catch (e: unknown) {
+			sortBy = [...sortBy];
+			error = e instanceof Error ? e.message : 'Failed to update setting';
+		} finally {
+			savingSortBy = false;
 		}
 	}
 
@@ -665,6 +707,7 @@
 		void loadBinContents();
 		void loadSetProgress();
 		void loadBinSettings();
+		void fetchLegoColors(baseUrl()).catch(() => {});
 		void sortingProfileStore.load(baseUrl()).catch(() => {});
 		// Auto-update without hammering the machine: the fast tick fetches the
 		// small layout payload (live chute angle) plus a tiny contents version
@@ -715,6 +758,7 @@
 		void loadBinContents();
 		void loadSetProgress();
 		void loadBinSettings();
+		void fetchLegoColors(nextBaseUrl).catch(() => {});
 		void sortingProfileStore.load(nextBaseUrl).catch(() => {});
 	});
 
@@ -777,6 +821,23 @@
 
 		<Panel flush>
 			<div class="divide-y divide-line">
+				<SettingRow
+					label="Name bins by"
+					help="What a bin collects: a category, a part, a color, or a mix such as part + color. Sort in three passes (category, then part, then color) by changing this between runs, or in one pass with a mix. Bins that are already assigned keep their names, so reset the bins when you change it."
+				>
+					<div class="flex flex-wrap items-center gap-4" role="group" aria-label="Name bins by">
+						{#each BIN_KEY_COMPONENTS as component (component)}
+							<Checkbox
+								checked={sortBy.includes(component)}
+								disabled={savingSortBy}
+								onchange={(event) =>
+									void toggleSortBy(component, (event.currentTarget as HTMLInputElement).checked)}
+							>
+								{BIN_KEY_LABELS[component]}
+							</Checkbox>
+						{/each}
+					</div>
+				</SettingRow>
 				<SettingRow
 					label="Allow multiple categories per bin"
 					help="When every bin already has an assignment, keep sorting new categories by combining them into existing bins (least-loaded first) instead of sending them to the discard passthrough."

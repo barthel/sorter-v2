@@ -84,7 +84,10 @@ DEFINITIONS: list[dict[str, Any]] = [
         "key": "default:bins-by-part",
         "rank": 4,
         "name": "One bin per part",
-        "description": "Sort by part number: each part gets its own bin, in any color.",
+        "description": (
+            "Sort by part number: each part gets its own bin, in any color. The machine names its bins "
+            "after the parts; the BrickLink categories listed here are only how records file a piece."
+        ),
         "rules": [],
         "fallback_mode": {"bricklink_categories": True},
         "bin_sort_by": ["part"],
@@ -93,7 +96,10 @@ DEFINITIONS: list[dict[str, Any]] = [
         "key": "default:bins-by-color",
         "rank": 5,
         "name": "One bin per color",
-        "description": "Sort by color: each color gets its own bin, whatever the part.",
+        "description": (
+            "Sort by color: each color gets its own bin, whatever the part. The machine names its bins "
+            "after the colors; the bins listed here are only how records file a piece."
+        ),
         "rules": [],
         "fallback_mode": {"by_color": True},
         "bin_sort_by": ["color"],
@@ -102,7 +108,10 @@ DEFINITIONS: list[dict[str, Any]] = [
         "key": "default:bins-by-part-and-color",
         "rank": 6,
         "name": "One bin per part and color (LOT)",
-        "description": "Sort into lots: each combination of part and color gets its own bin.",
+        "description": (
+            "Sort into lots: each combination of part and color gets its own bin. The machine names its "
+            "bins after part and color; the BrickLink categories listed here are only how records file a piece."
+        ),
         "rules": [],
         "fallback_mode": {"bricklink_categories": True},
         "bin_sort_by": ["part", "color"],

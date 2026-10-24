@@ -123,7 +123,14 @@ clears its bin assignments if that changed them.
 
 The three defaults that use it have no rules: `One bin per part`
 (`["part"]`), `One bin per color` (`["color"]`) and `One bin per part and
-color (LOT)` (`["part", "color"]`).
+color (LOT)` (`["part", "color"]`). The bins a profile page lists for them
+are the fallback's categories or colors, which is how a record files a piece;
+the descriptions say so, so nobody picks one of them for a category sort.
+
+`bin_sort_by` is part of what a profile version is: `POST /api/profiles`,
+`POST /api/profiles/{id}/versions`, `/preview` and `/route` take it, the
+version detail returns it, and a fork or an AI-applied version copies it from
+the version it starts from. The editor keeps it when it saves.
 
 ## For assistants
 

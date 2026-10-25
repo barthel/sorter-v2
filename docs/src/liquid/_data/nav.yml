@@ -226,6 +226,8 @@ sections:
             url: /sorter/training-data/
       - title: Under the hood
         pages:
+          - title: The Linux system
+            url: /sorter/linux-system/
           - title: Dev flow
             url: /sorter/dev-flow/
           - title: Sorting profile reference

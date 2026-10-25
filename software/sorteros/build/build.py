@@ -531,8 +531,13 @@ def _set_wifi_country(ctx: BuildCtx) -> None:
 
 def _write_config_placeholder(ctx: BuildCtx) -> None:
     padding = CFG_PLACEHOLDER_BYTES - len(CFG_START_MARKER) - len(CFG_END_MARKER)
+    placeholder = CFG_START_MARKER + "\n" * padding + CFG_END_MARKER
     cfg = ctx.mnt / "etc" / "sorteros-config.toml"
-    cfg.write_text(CFG_START_MARKER + "\n" * padding + CFG_END_MARKER)
+    # A respun image has it already. Writing it again can move it to new
+    # blocks and leave the old copy in free space, and the setup site patches
+    # the first copy it finds in the raw image.
+    if not (cfg.exists() and cfg.read_text() == placeholder):
+        cfg.write_text(placeholder)
     os.chmod(cfg, 0o600)  # the setup site puts the Wi-Fi password and Tailscale key here
     log(f"wrote the setup-site placeholder: {cfg.relative_to(ctx.mnt)} ({padding} bytes of room)")
 

@@ -98,7 +98,9 @@ DEFINITIONS: list[dict[str, Any]] = [
         "name": "One bin per color",
         "description": (
             "Sort by color: each color gets its own bin, whatever the part. The machine names its bins "
-            "after the colors; the bins listed here are only how records file a piece."
+            "after the colors themselves, not after this profile's categories, so you can follow it with a "
+            "pass by part. Unlike Colors, which uses a color as a category, this profile needs a machine "
+            "that can name bins by color. The bins listed here are only how records file a piece."
         ),
         "rules": [],
         "fallback_mode": {"by_color": True},

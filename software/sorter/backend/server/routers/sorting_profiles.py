@@ -443,6 +443,36 @@ def get_local_profile_meta(filename: str) -> dict[str, Any]:
     }
 
 
+@router.get("/api/sorting-profiles/local/{filename}/metadata")
+def get_local_profile_metadata(filename: str) -> dict[str, Any]:
+    # What the profile sorts into, in the shape of /sorting-profile/metadata, so
+    # a saved profile can be read before it is activated.
+    path = _safe_local_path(filename)
+    if not path.exists():
+        raise HTTPException(status_code=404, detail="Local profile not found.")
+    try:
+        data = profileSummary(str(path))
+    except (OSError, ValueError) as exc:
+        raise HTTPException(status_code=422, detail=f"Profile unreadable: {exc}")
+    stats = data.get("stats") if isinstance(data.get("stats"), dict) else {}
+    return {
+        "id": data.get("id") or path.stem,
+        "name": data.get("name") or path.stem,
+        "description": data.get("description") or "",
+        "created_at": data.get("created_at") or "",
+        "updated_at": data.get("updated_at") or "",
+        "default_category_id": data.get("default_category_id") or "misc",
+        "categories": data.get("categories") or {},
+        "category_order": [str(item) for item in data.get("category_order") or []],
+        "rules": data.get("rules") or [],
+        "fallback_mode": data.get("fallback_mode")
+        or {"rebrickable_categories": False, "bricklink_categories": False, "by_color": False},
+        "stats": {k: v for k, v in stats.items() if k != "samples"} or None,
+        "requires": [str(item) for item in data.get("requires") or []],
+        "bin_sort_by": [str(item) for item in data.get("bin_sort_by") or []],
+    }
+
+
 @router.get("/api/sorting-profiles/targets/{target_id}/library")
 def get_sorting_profile_target_library(target_id: str) -> dict[str, Any]:
     # Single target's Hive fetch. The page calls one of these per enabled
